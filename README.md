@@ -25,7 +25,8 @@ that automatically increases.
 
 autoversion does this by scanning specifically given or all source files for a language specific definition and increments
 it. In effect autoversion changes the source code. autoversion can easily be added to the pre-commit 
-hook of git which we will describe below. An alternative would be calling it from a makefile. 
+hook of git, see [here](https://verdantfox.com/blog/how-to-use-git-pre-commit-hooks-the-hard-way-and-the-easy-way) 
+for a description. An alternative would be calling it from a makefile. 
 
 In case of a Go codebase autoversion will scan all .go files searching for `const AutoVersion = ` and will
 increase the last number of the following version string. For example 
@@ -36,12 +37,12 @@ increase the last number of the following version string. For example
 - `const AutoVersion = "version 0.9.32 NOT FOR RELEASE`" will turn into `const AutoVersion = "version 0.9.33 NOT FOR RELEASE"`
 - `const AutoVersion = "I don't understand the concept of a number"` will **not** change at all
 
-autoversion assumes e.g. `const AutoVersion = ` to be defined near the beginning of the file. For 
+autoversion assumes e.g. `const AutoVersion` to be defined near the beginning of the file. For 
 efficiency reasons it will stop scanning the source file as early as possible. In case of Go this
 happens with the first `func` found. 
 
 For each programming language supported autoversion stores a
-list of file extensions, the appropriate definition, e.g. `public static final String AUTO_VERSION = ` 
+list of file extensions, the appropriate definition, e.g. `public static final String AUTO_VERSION` 
 for [Java](https://www.java.com/) and a text which will terminate the scanning, e.g. `function` for 
 [Javascript](https://www.ecma-international.org/publications-and-standards/standards/ecma-262/).
 
@@ -51,7 +52,8 @@ with **autoversion --lang**
 ## Installation
 
 The easiest way is to download a suitable binary from the release page on github and copy that to your 
-path. If you have [Task](https://taskfile.dev/) installed you can build it with 
+path. If you have [Task](https://taskfile.dev/) installed you can build it with `task build`. See the
+Taskfile.yml. It is easy to understand.
 
 ## Alternatives
 
