@@ -1,0 +1,45 @@
+version: '3'
+
+vars:
+  PROGRAM: autoversion
+
+tasks:
+  run:
+    # task run -- --lang (the first -- is needed)
+    - {{.PROGRAM}}
+    - go run cmd/main.go {{.CLI_ARGS}}
+
+  build:
+    deps: [test]
+    cmds:
+      - go build -o {{.PROGRAM}} cmd/main.go
+
+  install:
+    deps: [build]
+    cmds:
+      - cp {{.PROGRAM}} ~/go/bin/
+
+  test:
+    - go test -failfast ./...
+
+  create-release-for-github:
+    deps: [install]
+    vars:
+      PRG_VERSION:
+        sh: {{.PROGRAM}} --version
+    cmds:
+      # go tool dist list
+      - echo {{.PRG_VERSION}}
+      - GOOS=darwin GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_darwin_amd64 cmd/main.go
+      - GOOS=darwin GOARCH=arm64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_darwin_arm64 cmd/main.go
+      - GOOS=linux GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_linux_amd64 cmd/main.go
+      - GOOS=windows GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_windows_amd64.exe cmd/main.go
+
+  upload_to_github:
+    # this task does NOT depend on create-release-for-github.
+    # I want to do a manual check before uploading anything.
+    vars:
+      PRG_VERSION:
+        sh: {{.PROGRAM}} --version
+    cmds:
+        - gh release create v{{.PRG_VERSION}} ./releases/*
