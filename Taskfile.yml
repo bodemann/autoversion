@@ -6,7 +6,7 @@ vars:
 tasks:
   run:
     # task run -- --lang (the first -- is needed)
-    - {{.PROGRAM}}
+    - autoversion
     - go run cmd/main.go {{.CLI_ARGS}}
 
   build:
@@ -26,7 +26,7 @@ tasks:
     deps: [install]
     vars:
       PRG_VERSION:
-        sh: {{.PROGRAM}} --version
+        sh: autoversion --version
     cmds:
       # go tool dist list
       - echo {{.PRG_VERSION}}
@@ -40,6 +40,6 @@ tasks:
     # I want to do a manual check before uploading anything.
     vars:
       PRG_VERSION:
-        sh: {{.PROGRAM}} --version
+        sh: autoversion --version
     cmds:
         - gh release create v{{.PRG_VERSION}} ./releases/*
