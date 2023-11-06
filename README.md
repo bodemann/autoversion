@@ -5,6 +5,9 @@ autoversion increases a version number in a source file. It scans for a version 
 
 autoversion is usually triggered from a pre commit hook or from a makefile. 
 
+The program is developed in **pure** [Go](https://go.dev/). Github shows several other languages which happen to be 
+**test files** for different languages.
+
 Licensed under MIT
 
 ## Description
