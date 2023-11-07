@@ -12,34 +12,30 @@ tasks:
   build:
     deps: [test]
     cmds:
+      - autoversion
       - go build -o {{.PROGRAM}} cmd/main.go
 
   install:
-    deps: [build]
     cmds:
       - cp {{.PROGRAM}} ~/go/bin/
 
   test:
     - go test -failfast ./...
 
+  # does not call [build] task.
+  # you need to do this manually before create-release-for-github
+  # otherwise the current version number cannot be determined since
+  # the vars: section always runs before any other deps
   create-release-for-github:
-    deps: [install]
     vars:
       PRG_VERSION:
         sh: autoversion --version
     cmds:
-      # go tool dist list
-      - echo {{.PRG_VERSION}}
+      - rm releases/*
       - GOOS=darwin GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_darwin_amd64 cmd/main.go
       - GOOS=darwin GOARCH=arm64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_darwin_arm64 cmd/main.go
       - GOOS=linux GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_linux_amd64 cmd/main.go
       - GOOS=windows GOARCH=amd64 go build -o releases/{{.PROGRAM}}_{{.PRG_VERSION}}_windows_amd64.exe cmd/main.go
-
-  upload_to_github:
-    # this task does NOT depend on create-release-for-github.
-    # I want to do a manual check before uploading anything.
-    vars:
-      PRG_VERSION:
-        sh: autoversion --version
-    cmds:
-        - gh release create v{{.PRG_VERSION}} ./releases/*
+      # https://cli.github.com/manual/gh_release_create
+      # https://github.com/cli/cli
+      - gh release create v{{.PRG_VERSION}} ./releases/* --title v{{.PRG_VERSION}}
